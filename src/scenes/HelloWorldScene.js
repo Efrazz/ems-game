@@ -15,3 +15,5 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.physics.add.image(400, 100, "ball");
   }
 }
+
+console.log("hello");
