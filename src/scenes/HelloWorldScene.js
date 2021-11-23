@@ -1,6 +1,6 @@
-import Phaser from "phaser";
+import Phaser from 'phaser';
 
-import playerImage from "../../public/images/ball.png";
+import playerImage from '../../public/images/ball.png';
 
 let player, keys, world;
 
@@ -23,19 +23,19 @@ let gameOptions = {
 
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
-    super("hello-world");
+    super('hello-world');
   }
 
   preload() {
-    this.load.image("player", playerImage);
+    this.load.image('player', playerImage);
   }
 
   create() {
     keys = this.input.keyboard.addKeys({
-      up: "w",
-      down: "s",
-      left: "a",
-      right: "d",
+      up: 'w',
+      down: 's',
+      left: 'a',
+      right: 'd',
     });
 
     world = {
@@ -43,7 +43,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       height: this.physics.world.bounds.height,
     };
 
-    player = this.physics.add.sprite(world.width / 2, world.height, "player");
+    player = this.physics.add.sprite(world.width / 2, world.height, 'player');
     player.setCollideWorldBounds(true);
   }
 
