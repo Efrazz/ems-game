@@ -1,18 +1,20 @@
 import Phaser from 'phaser';
-import backgroundImage from '../../public/images/background/background.png';
 
 import santaImage from '../../public/assets/santa.png'; // Sprite sheet
 import santaAtlas from '../../public/assets/santa.json'; // For animations
-//import sound from '../../public/assets/mario.mp3'; // For animations
 
-import tileSheet1 from '../../public/assets/sheet1.png';
+import snowmanImage from '../../public/assets/snowman.png'; // Snowman Sprite sheet
+import snowmanAtlas from '../../public/assets/snowman.json'; // Snowman for animations
+
 import tileSheet from '../../public/assets/sheet.png';
 import tileMap from '../../public/assets/game.json';
+
 import star from '../../public/assets/star.png';
 
-let background, player, keys, world, soundd;
+let snowman, player, keys, sound;
 
 let isMoving = false,
+  isClimbing = false,
   touchingGround = true,
   jumpCount = 0,
   alreadyPressed = false;
@@ -42,56 +44,58 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     // Background
-    this.load.image('background', backgroundImage);
     this.load.image('star', star);
-    this.load.audio('jumpsound', '../../music/mario.mp3');
+    // this.load.audio('jumpsound', '../../music/mario.mp3');
 
     // Tiles
     this.load.image('tiles', tileSheet);
-    this.load.image('tiles', tileSheet1);
     this.load.tilemapTiledJSON('tilemap', tileMap);
 
     // Player
     this.load.atlas('santa', santaImage, santaAtlas);
+    // Snowman
+    this.load.atlas('snowman', snowmanImage, snowmanAtlas);
   }
 
   create() {
-    soundd = this.sound.add('jumpsound');
-    // Getting width and height properties of the world and storing in object
-    world = {
-      width: this.scale.width,
-      height: this.scale.height,
-    };
+    // sound = this.sound.add('jumpsound');
 
     // Init animations
     this.createSantaAnimations();
+    this.createSnowmanAnimations();
 
     // Tiles
     const map = this.make.tilemap({ key: 'tilemap' });
     // "sheet" is the name of the tileset in iceworld.tmx | 'tiles' is the imported image loaded from sheet.png
     const tileset = map.addTilesetImage('sheet', 'tiles');
 
-    const tileProperties = tileset.tileProperties;
-    console.log(tileProperties);
-
     // "ground" comes from iceworld.tmx and is the name of the layer
     const ground = map.createLayer('ground', tileset);
     // Set collision to true for objects in ground-layer with property "collides: true"
     ground.setCollisionByProperty({ collides: true });
 
-    // const ladders =
-
     const objectsLayer = map.getObjectLayer('objects');
     objectsLayer.objects.forEach((objData) => {
-      const { x = 0, y = 60, name, width, height } = objData;
+      const { x = 0, y = 0, name, width, height } = objData;
       switch (name) {
         case 'spawn': {
           player = this.matter.add
             .sprite(x - width * 0.5, y - height * 0.5, 'santa')
-            .play('player-idle', true)
-            // stops santa from rotating
+            .setRectangle(32, 50)
+            .setFixedRotation()
+            .setOrigin(0.4, 0.5)
+            .play('player-idle', true);
+          break;
+        }
+        case 'enemy-spawn': {
+          snowman = this.matter.add
+            .sprite(x, y + 30, 'snowman', null, {
+              label: 'enemy',
+            })
+            .setScale(0.5)
+            .play('snowman-left', true)
             .setFixedRotation();
-          //player.setBounce(1);
+
           break;
         }
         case 'star': {
@@ -99,17 +103,28 @@ export default class GameScene extends Phaser.Scene {
             isStatic: true,
             isSensor: true,
           });
-
+          break;
+        }
+        case 'ladder': {
+          this.ladder = this.matter.add.rectangle(
+            x + width * 0.5,
+            y + height * 0.5,
+            width,
+            height,
+            {
+              isStatic: true,
+              isSensor: true,
+              label: 'ladder',
+            }
+          );
           break;
         }
       }
     });
-    let x = 0,
-      y = 0;
+
     this.cameras.main.startFollow(player);
-    // this.matter.add.sprite(x + 70, y + 50, 'star');
+
     this.matter.world.convertTilemapLayer(ground);
-    player.setVelocityX(50);
   }
 
   update() {
@@ -120,8 +135,12 @@ export default class GameScene extends Phaser.Scene {
       isMoving = true;
     }
 
+    // # Player movement
     if (isMoving || !touchingGround) {
       if (keys.left.isDown) {
+        // Adjust origin for hitbox alignment
+        player.setOrigin(0.6, 0.5);
+
         player.flipX = true;
         if (!touchingGround) {
           player.setVelocityX(-gameOptions.playerSpeed);
@@ -131,6 +150,9 @@ export default class GameScene extends Phaser.Scene {
             .play('player-walk', true);
         }
       } else if (keys.right.isDown) {
+        // Adjust origin for hitbox alignment
+        player.setOrigin(0.4, 0.5);
+
         player.flipX = false;
         if (!touchingGround) {
           player.setVelocityX(gameOptions.playerSpeed);
@@ -140,25 +162,65 @@ export default class GameScene extends Phaser.Scene {
             .play('player-walk', true);
         }
       }
-
-      // Stop horizontal movement (Only needed if moving player instead of background)
+      // Stop horizontal movement
     } else {
       player.setVelocityX(0).play('player-idle', true);
     }
 
-    //Detect collision with ground
-    this.matter.world.on('collisionactive', (left, right, top, bottom) => {
+    //Detect collisions
+    player.setOnCollide((obj) => {
       jumpCount = 0;
       touchingGround = true;
+      isClimbing = false;
+
+      const collisionObj = obj.bodyB;
+
+      if (collisionObj.label === 'enemy') {
+        // Do this when colliding with enemy
+        // ...
+      }
+      if (collisionObj.label === 'food') {
+        // Do this when colliding with food
+        // ...
+      }
     });
 
-    // If button "up" is pressed down and
-    if (keys.up.isDown && alreadyPressed === false) {
+    player.setOnCollideActive((data) => {
+      const collisionObj = data.bodyB;
+
+      // If colliding with ladder
+      if (collisionObj.label === 'ladder' && !touchingGround) {
+        console.log('climbing');
+        player.setIgnoreGravity(true);
+        isClimbing = true;
+      }
+    });
+
+    player.setOnCollideEnd((data) => {
+      const collisionObj = data.bodyB;
+
+      // If colliding with ladder
+      if (collisionObj.label === 'ladder') {
+        console.log('climb end');
+        player.setIgnoreGravity(false);
+        isClimbing = false;
+      }
+    });
+
+    // # Player jump
+    // If player is not climbing, button "up" is pressed down button has not
+    if (!isClimbing && keys.up.isDown && alreadyPressed === false) {
       this.jump();
-      soundd.play();
+      // sound.play();
+
       alreadyPressed = true;
     } else if (keys.up.isUp) {
       alreadyPressed = false;
+    }
+
+    // # climbing
+    if (isClimbing) {
+      this.climb();
     }
   }
   jump() {
@@ -169,6 +231,16 @@ export default class GameScene extends Phaser.Scene {
       player.play('player-jump');
       player.setVelocityY(-gameOptions.jumpForce);
       jumpCount++;
+    }
+  }
+
+  climb() {
+    // gameOptions.playerGravity = 0;
+    if (keys.up.isDown) {
+      player.setVelocity(0, -5);
+      player.setVelocity(0, 5);
+    } else {
+      player.setVelocity(0, 0);
     }
   }
 
@@ -207,17 +279,29 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  // addPlatform(x, y, width) {
-  //   let platform = this.physics.add.sprite(x, y, 'tile');
-  //   platform.displayWidth = width;
-  //   platform.setImmovable(true);
-  //   platform.setScale(0.2);
+  createSnowmanAnimations() {
+    this.anims.create({
+      key: 'snowman-left',
+      frameRate: 10,
+      frames: this.anims.generateFrameNames('snowman', {
+        start: 1,
+        end: 2,
+        prefix: 'snowman_left_',
+        suffix: '.png',
+      }),
+      repeat: -1,
+    });
 
-  //   platformGroup.add(platform);
-  // }
+    this.anims.create({
+      key: 'snowman-right',
+      frameRate: 10,
+      frames: this.anims.generateFrameNames('snowman', {
+        start: 1,
+        end: 2,
+        prefix: 'snowman_right_',
+        suffix: '.png',
+      }),
+      repeat: -1,
+    });
+  }
 }
-
-// What I've done
-// Jump
-// Movement left and right (should probably me changed to world moving for endless runner)
-// Added variables for game settings, same could be done for player settings
