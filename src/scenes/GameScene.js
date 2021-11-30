@@ -1,16 +1,17 @@
 import Phaser from 'phaser';
-import backgroundImage from '../../public/images/background/background.png';
 
 import santaImage from '../../public/assets/santa.png'; // Sprite sheet
 import santaAtlas from '../../public/assets/santa.json'; // For animations
 
-import snowmanImage from '../../public/assets/snowman.png'; // snowman Sprite sheet
-import snowmanAtlas from '../../public/assets/snowman.json'; // snowman For animations
+import snowmanImage from '../../public/assets/snowman.png'; // Snowman Sprite sheet
+import snowmanAtlas from '../../public/assets/snowman.json'; // Snowman for animations
 
 import tileSheet from '../../public/assets/sheet.png';
 import tileMap from '../../public/assets/game.json';
 
-let snowman, player, keys, world;
+import star from '../../public/assets/star.png';
+
+let snowman, player, keys, sound;
 
 let isMoving = false,
   isClimbing = false,
@@ -20,9 +21,9 @@ let isMoving = false,
 
 // Global game options
 let gameOptions = {
-  playerGravity: 500,
-  playerSpeed: 5,
-  jumpForce: 5,
+  playerGravity: 900,
+  playerSpeed: 8,
+  jumpForce: 14,
   playerStartPosition: 200,
   jumps: 2,
 };
@@ -43,7 +44,8 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     // Background
-    this.load.image('background', backgroundImage);
+    this.load.image('star', star);
+    // this.load.audio('jumpsound', '../../music/mario.mp3');
 
     // Tiles
     this.load.image('tiles', tileSheet);
@@ -56,24 +58,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Getting width and height properties of the world and storing in object
-    world = {
-      width: this.scale.width,
-      height: this.scale.height,
-    };
+    // sound = this.sound.add('jumpsound');
 
     // Init animations
     this.createSantaAnimations();
     this.createSnowmanAnimations();
-
-    // Background
-    // this.background = this.add.tileSprite(
-    //   world.width * 0.5,
-    //   world.height * 0.5,
-    //   0,
-    //   world.height,
-    //   'background'
-    // );
 
     // Tiles
     const map = this.make.tilemap({ key: 'tilemap' });
@@ -107,6 +96,13 @@ export default class GameScene extends Phaser.Scene {
             .play('snowman-left', true)
             .setFixedRotation();
 
+          break;
+        }
+        case 'star': {
+          this.matter.add.sprite(x + 60, y + 80, 'star', undefined, {
+            isStatic: true,
+            isSensor: true,
+          });
           break;
         }
         case 'ladder': {
@@ -215,6 +211,8 @@ export default class GameScene extends Phaser.Scene {
     // If player is not climbing, button "up" is pressed down button has not
     if (!isClimbing && keys.up.isDown && alreadyPressed === false) {
       this.jump();
+      // sound.play();
+
       alreadyPressed = true;
     } else if (keys.up.isUp) {
       alreadyPressed = false;
@@ -234,18 +232,8 @@ export default class GameScene extends Phaser.Scene {
       player.setVelocityY(-gameOptions.jumpForce);
       jumpCount++;
     }
-
-    // Reduced height second jump
-    // if (jumpCount == 0) {
-    //   player.play('player-jump');
-    //   player.setVelocityY(-gameOptions.jumpForce);
-    //   jumpCount++;
-    // } else if (jumpCount == 1) {
-    //   player.play('player-jump');
-    //   player.setVelocityY(-gameOptions.jumpForce * 0.9);
-    //   jumpCount++;
-    // }
   }
+
   climb() {
     // gameOptions.playerGravity = 0;
     if (keys.up.isDown) {
@@ -316,18 +304,4 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1,
     });
   }
-
-  // addPlatform(x, y, width) {
-  //   let platform = this.physics.add.sprite(x, y, 'tile');
-  //   platform.displayWidth = width;
-  //   platform.setImmovable(true);
-  //   platform.setScale(0.2);
-
-  //   platformGroup.add(platform);
-  // }
 }
-
-// What I've done
-// Jump
-// Movement left and right (should probably me changed to world moving for endless runner)
-// Added variables for game settings, same could be done for player settings
