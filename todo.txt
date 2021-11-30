@@ -1,7 +1,9 @@
 - Add static platform
 - Add platforms dynamically
+- Add platforms to group
 - Make background move (if endless runner is what we want to do)
 - Give it temporary name
+
 
 Pull/Push routine
 - Pull to make sure you have latest version of the project, either from main or personal branch
