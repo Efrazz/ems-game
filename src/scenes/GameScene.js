@@ -12,9 +12,22 @@ import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
+<<<<<<< HEAD
 let snowman, player, keys, sound, text, stars, obstacles, gameObject;
 
 let isMoving = false,
+=======
+let snowman,
+  player,
+  keys,
+  sound,
+  text,
+  stars,
+  points = 0;
+
+let isDead = false,
+  isMoving = false,
+>>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
   isClimbing = false,
   touchingGround = true,
   jumpCount = 0,
@@ -95,11 +108,12 @@ export default class GameScene extends Phaser.Scene {
             .setFixedRotation()
             .setOrigin(0.4, 0.5)
             .play('player-idle', true);
+          player.setFriction(1);
           break;
         }
         case 'enemy-spawn': {
           snowman = this.matter.add
-            .sprite(x, y + 30, 'snowman', null, {
+            .sprite(x, y, 'snowman', null, {
               label: 'enemy',
             })
             .setScale(0.5)
@@ -109,10 +123,14 @@ export default class GameScene extends Phaser.Scene {
           break;
         }
         case 'star': {
-          this.matter.add.sprite(x + 30, y + 30, 'star', undefined, {
+          this.matter.add.sprite(x + 30, y + 30, 'star', null, {
             isStatic: true,
             isSensor: true,
+<<<<<<< HEAD
             label: 'ladder',
+=======
+            label: 'star',
+>>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
           });
           break;
         }
@@ -134,6 +152,14 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.cameras.main.startFollow(player);
+
+    //screen fadeout
+    this.cameras.main.once(
+      Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+      (cam, effect) => {
+        this.scene.start();
+      }
+    );
 
     this.matter.world.convertTilemapLayer(ground);
 
@@ -181,7 +207,7 @@ export default class GameScene extends Phaser.Scene {
     text.y = player.body.position.y - 290;
     // player.body.velocity.x = 150;
     // Change isMoving to true if left or right key is pressed down
-    if (keys.left.isDown || keys.right.isDown) {
+    if ((keys.left.isDown || keys.right.isDown) && !isDead) {
       isMoving = true;
     }
 
@@ -213,6 +239,8 @@ export default class GameScene extends Phaser.Scene {
         }
       }
       // Stop horizontal movement
+    } else if (isDead) {
+      player.setVelocityX(0);
     } else {
       player.setVelocityX(0).play('player-idle', true);
     }
@@ -226,17 +254,25 @@ export default class GameScene extends Phaser.Scene {
       const collisionObj = obj.bodyB;
 
       if (collisionObj.label === 'enemy') {
-        // Do this when colliding with enemy
-        // ...
+        isDead = true;
+        console.log('dead');
+        player.play('player-dead', true);
+        this.restartGame();
       }
       if (collisionObj.label === 'star') {
+<<<<<<< HEAD
         // Do this when colliding with food
         // ...
+=======
+        points++;
+        text.setText('Score: ' + points);
+        collisionObj.gameObject.destroy();
+>>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
       }
     });
 
-    player.setOnCollideActive((data) => {
-      const collisionObj = data.bodyB;
+    player.setOnCollideActive((obj) => {
+      const collisionObj = obj.bodyB;
 
       // If colliding with ladder
       if (collisionObj.label === 'ladder' && !touchingGround) {
@@ -246,8 +282,8 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
-    player.setOnCollideEnd((data) => {
-      const collisionObj = data.bodyB;
+    player.setOnCollideEnd((obj) => {
+      const collisionObj = obj.bodyB;
 
       // If colliding with ladder
       if (collisionObj.label === 'ladder') {
@@ -288,6 +324,7 @@ export default class GameScene extends Phaser.Scene {
     // gameOptions.playerGravity = 0;
     if (keys.up.isDown) {
       player.setVelocity(0, -5);
+    } else if (keys.down.isDown) {
       player.setVelocity(0, 5);
     } else {
       player.setVelocity(0, 0);
@@ -353,6 +390,26 @@ export default class GameScene extends Phaser.Scene {
       }),
       repeat: -1,
     });
+    this.anims.create({
+      key: 'player-dead',
+      frameRate: 30,
+      frames: this.anims.generateFrameNames('santa', {
+        start: 1,
+        end: 17,
+        prefix: 'Dead (',
+        suffix: ').png',
+      }),
+    });
+  }
+  restartGame() {
+    (isDead = false),
+      (isMoving = false),
+      (isClimbing = false),
+      (touchingGround = true),
+      (jumpCount = 0),
+      (alreadyPressed = false);
+
+    this.cameras.main.fadeOut(1000, 0, 0, 0);
   }
 
   //   killMonster() {
