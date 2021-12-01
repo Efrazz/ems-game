@@ -7,7 +7,7 @@ import snowmanImage from '../../public/assets/snowman.png'; // Snowman Sprite sh
 import snowmanAtlas from '../../public/assets/snowman.json'; // Snowman for animations
 
 import tileSheet from '../../public/assets/sheet.png';
-import tileSheet1 from '../../public/assets/dude.png';
+
 import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
@@ -49,7 +49,7 @@ export default class GameScene extends Phaser.Scene {
     // this.load.audio('jumpsound', '../../music/mario.mp3');
 
     // Tiles
-    this.load.image('tiles', tileSheet, tileSheet1);
+    this.load.image('tiles', tileSheet);
     this.load.tilemapTiledJSON('tilemap', tileMap);
 
     // Player
@@ -137,8 +137,8 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     isMoving = false;
-    text.x = player.body.position.x - 90;
-    text.y = player.body.position.y - 90;
+    text.x = player.body.position.x - 390;
+    text.y = player.body.position.y - 290;
 
     // Change isMoving to true if left or right key is pressed down
     if (keys.left.isDown || keys.right.isDown) {
