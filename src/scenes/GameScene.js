@@ -14,7 +14,8 @@ import star from '../../public/assets/star.png';
 
 let snowman, player, keys, sound, text, stars;
 
-let isMoving = false,
+let isDead = false,
+  isMoving = false,
   isClimbing = false,
   touchingGround = true,
   jumpCount = 0,
@@ -93,11 +94,12 @@ export default class GameScene extends Phaser.Scene {
             .setFixedRotation()
             .setOrigin(0.4, 0.5)
             .play('player-idle', true);
+          player.setFriction(1);
           break;
         }
         case 'enemy-spawn': {
           snowman = this.matter.add
-            .sprite(x, y + 30, 'snowman', null, {
+            .sprite(x, y, 'snowman', null, {
               label: 'enemy',
             })
             .setScale(0.5)
@@ -110,6 +112,7 @@ export default class GameScene extends Phaser.Scene {
           this.matter.add.sprite(x + 30, y + 30, 'star', undefined, {
             isStatic: true,
             isSensor: true,
+            label: star,
           });
           break;
         }
@@ -141,7 +144,7 @@ export default class GameScene extends Phaser.Scene {
     text.y = player.body.position.y - 290;
 
     // Change isMoving to true if left or right key is pressed down
-    if (keys.left.isDown || keys.right.isDown) {
+    if ((keys.left.isDown || keys.right.isDown) && !isDead) {
       isMoving = true;
     }
 
@@ -173,6 +176,8 @@ export default class GameScene extends Phaser.Scene {
         }
       }
       // Stop horizontal movement
+    } else if (isDead) {
+      player.setVelocityX(0);
     } else {
       player.setVelocityX(0).play('player-idle', true);
     }
@@ -183,15 +188,19 @@ export default class GameScene extends Phaser.Scene {
       touchingGround = true;
       isClimbing = false;
 
+      console.log(obj.bodyA);
+
       const collisionObj = obj.bodyB;
 
       if (collisionObj.label === 'enemy') {
-        // Do this when colliding with enemy
-        // ...
+        isDead = true;
+        console.log('dead');
+        player.play('player-dead', true);
       }
       if (collisionObj.label === 'star') {
         // Do this when colliding with food
         // ...
+        console.log('star collision');
         star.destroy();
       }
     });
@@ -249,6 +258,7 @@ export default class GameScene extends Phaser.Scene {
     // gameOptions.playerGravity = 0;
     if (keys.up.isDown) {
       player.setVelocity(0, -5);
+    } else if (keys.down.isDown) {
       player.setVelocity(0, 5);
     } else {
       player.setVelocity(0, 0);
@@ -313,6 +323,16 @@ export default class GameScene extends Phaser.Scene {
         suffix: '.png',
       }),
       repeat: -1,
+    });
+    this.anims.create({
+      key: 'player-dead',
+      frameRate: 30,
+      frames: this.anims.generateFrameNames('santa', {
+        start: 1,
+        end: 17,
+        prefix: 'Dead (',
+        suffix: ').png',
+      }),
     });
   }
 }
