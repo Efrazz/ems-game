@@ -12,7 +12,7 @@ import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
-let snowman, player, keys, sound, text, stars;
+let snowman, player, keys, sound, text, stars, obstacles, gameObject;
 
 let isMoving = false,
   isClimbing = false,
@@ -79,6 +79,8 @@ export default class GameScene extends Phaser.Scene {
 
     // "ground" comes from iceworld.tmx and is the name of the layer
     const ground = map.createLayer('ground', tileset);
+    const ground1 = map.createLayer('ground1', tileset);
+    // ground.setCollisionByExclusion(-1, true);
     // Set collision to true for objects in ground-layer with property "collides: true"
     ground.setCollisionByProperty({ collides: true });
 
@@ -110,6 +112,7 @@ export default class GameScene extends Phaser.Scene {
           this.matter.add.sprite(x + 30, y + 30, 'star', undefined, {
             isStatic: true,
             isSensor: true,
+            label: 'ladder',
           });
           break;
         }
@@ -133,13 +136,50 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(player);
 
     this.matter.world.convertTilemapLayer(ground);
+
+    player.setOnCollide(() => {
+      // const body = data.bodyB as MatterJS.BodyType
+      // if (this.obstacles.is('spikes', body))
+      // {
+      //     this.stateMachine.setState('spike-hit')
+      //     return
+      // }
+      // if (this.obstacles.is('snowman', body))
+      // {
+      //     this.lastSnowman = body.gameObject
+      //     if (this.sprite.y < body.position.y)
+      //     {
+      //         // stomp on snowman
+      //         this.stateMachine.setState('snowman-stomp')
+      //     }
+      //     else
+      //     {
+      //         // hit by snowman
+      //         this.stateMachine.setState('snowman-hit')
+      //     }
+      //     return
+      // }
+      // const gameObject = body.gameObject
+      // if (!gameObject)
+      // {
+      //     return
+      // }
+      // if (gameObject instanceof Phaser.Physics.Matter.TileBody)
+      // {
+      //     if (this.stateMachine.isCurrentState('jump'))
+      //     {
+      //         this.stateMachine.setState('idle')
+      //     }
+      //     return
+      // }
+    });
   }
 
   update() {
     isMoving = false;
     text.x = player.body.position.x - 390;
     text.y = player.body.position.y - 290;
-
+    // player.body.velocity.x = 150;
     // Change isMoving to true if left or right key is pressed down
     if (keys.left.isDown || keys.right.isDown) {
       isMoving = true;
@@ -192,7 +232,6 @@ export default class GameScene extends Phaser.Scene {
       if (collisionObj.label === 'star') {
         // Do this when colliding with food
         // ...
-        star.destroy();
       }
     });
 
@@ -315,4 +354,10 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1,
     });
   }
+
+  //   killMonster() {
+  //     if (player.velocity.y > 0 || star.blocked.up) {
+  //       star.destroy();
+  //     }
+  //   }
 }
