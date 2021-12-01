@@ -7,11 +7,12 @@ import snowmanImage from '../../public/assets/snowman.png'; // Snowman Sprite sh
 import snowmanAtlas from '../../public/assets/snowman.json'; // Snowman for animations
 
 import tileSheet from '../../public/assets/sheet.png';
+import tileSheet1 from '../../public/assets/dude.png';
 import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
-let snowman, player, keys, sound;
+let snowman, player, keys, sound, text, stars;
 
 let isMoving = false,
   isClimbing = false,
@@ -48,7 +49,7 @@ export default class GameScene extends Phaser.Scene {
     // this.load.audio('jumpsound', '../../music/mario.mp3');
 
     // Tiles
-    this.load.image('tiles', tileSheet);
+    this.load.image('tiles', tileSheet, tileSheet1);
     this.load.tilemapTiledJSON('tilemap', tileMap);
 
     // Player
@@ -59,8 +60,15 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     // sound = this.sound.add('jumpsound');
-
+    text = this.add.text(100, 100, 'Score: 0', {
+      fontFamily: 'CustomFont',
+      fontSize: '32px',
+      align: 'left',
+      fill: '#FFFFFF',
+    });
+    text.setDepth(1000);
     // Init animations
+
     this.createSantaAnimations();
     this.createSnowmanAnimations();
 
@@ -93,13 +101,13 @@ export default class GameScene extends Phaser.Scene {
               label: 'enemy',
             })
             .setScale(0.5)
-            .play('snowman-left', true)
+            .play('snowman-right', true)
             .setFixedRotation();
 
           break;
         }
         case 'star': {
-          this.matter.add.sprite(x + 60, y + 80, 'star', undefined, {
+          this.matter.add.sprite(x + 30, y + 30, 'star', undefined, {
             isStatic: true,
             isSensor: true,
           });
@@ -129,6 +137,8 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     isMoving = false;
+    text.x = player.body.position.x - 90;
+    text.y = player.body.position.y - 90;
 
     // Change isMoving to true if left or right key is pressed down
     if (keys.left.isDown || keys.right.isDown) {
@@ -179,9 +189,10 @@ export default class GameScene extends Phaser.Scene {
         // Do this when colliding with enemy
         // ...
       }
-      if (collisionObj.label === 'food') {
+      if (collisionObj.label === 'star') {
         // Do this when colliding with food
         // ...
+        star.destroy();
       }
     });
 
