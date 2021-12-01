@@ -12,7 +12,13 @@ import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
-let snowman, player, keys, sound, text, stars;
+let snowman,
+  player,
+  keys,
+  sound,
+  text,
+  stars,
+  points = 0;
 
 let isDead = false,
   isMoving = false,
@@ -109,10 +115,10 @@ export default class GameScene extends Phaser.Scene {
           break;
         }
         case 'star': {
-          this.matter.add.sprite(x + 30, y + 30, 'star', undefined, {
+          this.matter.add.sprite(x + 30, y + 30, 'star', null, {
             isStatic: true,
             isSensor: true,
-            label: star,
+            label: 'star',
           });
           break;
         }
@@ -196,26 +202,23 @@ export default class GameScene extends Phaser.Scene {
       touchingGround = true;
       isClimbing = false;
 
-      console.log(obj.bodyA);
-
       const collisionObj = obj.bodyB;
 
       if (collisionObj.label === 'enemy') {
         isDead = true;
         console.log('dead');
         player.play('player-dead', true);
-        this.cameras.main.fadeOut(1000, 0, 0, 0);
+        this.restartGame();
       }
       if (collisionObj.label === 'star') {
-        // Do this when colliding with food
-        // ...
-        console.log('star collision');
-        star.destroy();
+        points++;
+        text.setText('Score: ' + points);
+        collisionObj.gameObject.destroy();
       }
     });
 
-    player.setOnCollideActive((data) => {
-      const collisionObj = data.bodyB;
+    player.setOnCollideActive((obj) => {
+      const collisionObj = obj.bodyB;
 
       // If colliding with ladder
       if (collisionObj.label === 'ladder' && !touchingGround) {
@@ -225,8 +228,8 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
-    player.setOnCollideEnd((data) => {
-      const collisionObj = data.bodyB;
+    player.setOnCollideEnd((obj) => {
+      const collisionObj = obj.bodyB;
 
       // If colliding with ladder
       if (collisionObj.label === 'ladder') {
@@ -343,5 +346,15 @@ export default class GameScene extends Phaser.Scene {
         suffix: ').png',
       }),
     });
+  }
+  restartGame() {
+    (isDead = false),
+      (isMoving = false),
+      (isClimbing = false),
+      (touchingGround = true),
+      (jumpCount = 0),
+      (alreadyPressed = false);
+
+    this.cameras.main.fadeOut(1000, 0, 0, 0);
   }
 }
