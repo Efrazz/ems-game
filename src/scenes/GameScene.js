@@ -135,6 +135,14 @@ export default class GameScene extends Phaser.Scene {
 
     this.cameras.main.startFollow(player);
 
+    //screen fadeout
+    this.cameras.main.once(
+      Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+      (cam, effect) => {
+        this.scene.start();
+      }
+    );
+
     this.matter.world.convertTilemapLayer(ground);
   }
 
@@ -196,6 +204,7 @@ export default class GameScene extends Phaser.Scene {
         isDead = true;
         console.log('dead');
         player.play('player-dead', true);
+        this.cameras.main.fadeOut(1000, 0, 0, 0);
       }
       if (collisionObj.label === 'star') {
         // Do this when colliding with food
