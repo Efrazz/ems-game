@@ -6,6 +6,12 @@
 
 body {
   width: 100vw;
+  /*background-color: rgb(47, 152, 201);*/
+  background-image: url(../../ems-game/public/assets/sdf.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border: radius 4px;
 }
 
 canvas {
