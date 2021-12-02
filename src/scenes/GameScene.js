@@ -29,10 +29,10 @@ let isDead = false,
 
 // Global game options
 let gameOptions = {
-  playerGravity: 900,
-  playerSpeed: 8,
-  jumpForce: 14,
-  playerStartPosition: 200,
+  playerGravity: 700,
+  playerSpeed: 6,
+  jumpForce: 6,
+  // playerStartPosition: 200,
   jumps: 2,
 };
 
@@ -85,7 +85,10 @@ export default class GameScene extends Phaser.Scene {
     const tileset = map.addTilesetImage('sheet', 'tiles');
 
     // "ground" comes from iceworld.tmx and is the name of the layer
-    const ground = map.createLayer('ground', tileset);
+    // const ground = map.createLayer('ground', tileset);
+    const ground = map.createDynamicLayer('ground', tileset);
+    console.log('dynamic layer: ', ground);
+
     // Set collision to true for objects in ground-layer with property "collides: true"
     ground.setCollisionByProperty({ collides: true });
 
@@ -95,12 +98,17 @@ export default class GameScene extends Phaser.Scene {
       switch (name) {
         case 'spawn': {
           player = this.matter.add
-            .sprite(x - width * 0.5, y - height * 0.5, 'santa')
-            .setRectangle(32, 50)
+            .sprite(x - width * 0.5, y - height * 0.5, 'santa', null)
+            .setRectangle(32, 50, {
+              chamfer: { radius: 10 },
+            })
             .setFixedRotation()
             .setOrigin(0.4, 0.5)
             .play('player-idle', true);
-          player.setFriction(1);
+
+          player.setFriction(0, 0, 1);
+          // player.restitution = 0.05;
+          console.log(player);
           break;
         }
         case 'enemy-spawn': {
@@ -148,8 +156,16 @@ export default class GameScene extends Phaser.Scene {
         this.scene.start();
       }
     );
-
     this.matter.world.convertTilemapLayer(ground);
+
+    ground.forEachTile((tile) => {
+      // If a tile body exists, set the friction of it to 0
+      if (tile.physics.matterBody.body) {
+        tile.physics.matterBody.body.friction = 0;
+      } else {
+        console.log('no bueno');
+      }
+    });
   }
 
   update() {
@@ -198,6 +214,7 @@ export default class GameScene extends Phaser.Scene {
 
     //Detect collisions
     player.setOnCollide((obj) => {
+      console.log(obj);
       jumpCount = 0;
       touchingGround = true;
       isClimbing = false;
@@ -235,6 +252,7 @@ export default class GameScene extends Phaser.Scene {
       if (collisionObj.label === 'ladder') {
         console.log('climb end');
         player.setIgnoreGravity(false);
+        player.play('player-jump');
         isClimbing = false;
       }
     });
@@ -270,8 +288,10 @@ export default class GameScene extends Phaser.Scene {
     // gameOptions.playerGravity = 0;
     if (keys.up.isDown) {
       player.setVelocity(0, -5);
+      player.play('player-climb', true);
     } else if (keys.down.isDown) {
       player.setVelocity(0, 5);
+      player.play('player-climb', true);
     } else {
       player.setVelocity(0, 0);
     }
@@ -307,6 +327,16 @@ export default class GameScene extends Phaser.Scene {
         start: 1,
         end: 16,
         prefix: 'Jump (',
+        suffix: ').png',
+      }),
+    });
+    this.anims.create({
+      key: 'player-climb',
+      frameRate: 10,
+      frames: this.anims.generateFrameNames('santa', {
+        start: 1,
+        end: 5,
+        prefix: 'Slide (',
         suffix: ').png',
       }),
     });
@@ -348,13 +378,18 @@ export default class GameScene extends Phaser.Scene {
     });
   }
   restartGame() {
+    this.cameras.main.fadeOut(1000, 0, 0, 0);
+
     (isDead = false),
       (isMoving = false),
       (isClimbing = false),
       (touchingGround = true),
       (jumpCount = 0),
-      (alreadyPressed = false);
-
-    this.cameras.main.fadeOut(1000, 0, 0, 0);
+      (alreadyPressed = false),
+      (points = 0);
   }
 }
+
+// Things to try
+// Chamfer sprite body
+// https://phaser.io/examples/v3/view/tilemap/collision/matter-platformer-with-wall-jumping
