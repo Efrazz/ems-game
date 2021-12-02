@@ -12,11 +12,6 @@ import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
-<<<<<<< HEAD
-let snowman, player, keys, sound, text, stars, obstacles, gameObject;
-
-let isMoving = false,
-=======
 let snowman,
   player,
   keys,
@@ -27,7 +22,6 @@ let snowman,
 
 let isDead = false,
   isMoving = false,
->>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
   isClimbing = false,
   touchingGround = true,
   jumpCount = 0,
@@ -126,11 +120,7 @@ export default class GameScene extends Phaser.Scene {
           this.matter.add.sprite(x + 30, y + 30, 'star', null, {
             isStatic: true,
             isSensor: true,
-<<<<<<< HEAD
-            label: 'ladder',
-=======
             label: 'star',
->>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
           });
           break;
         }
@@ -260,14 +250,9 @@ export default class GameScene extends Phaser.Scene {
         this.restartGame();
       }
       if (collisionObj.label === 'star') {
-<<<<<<< HEAD
-        // Do this when colliding with food
-        // ...
-=======
         points++;
         text.setText('Score: ' + points);
         collisionObj.gameObject.destroy();
->>>>>>> 460eeb04d45b88c8e6762d0eb8c539cfc7155067
       }
     });
 
