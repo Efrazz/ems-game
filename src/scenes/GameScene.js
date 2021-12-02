@@ -12,13 +12,18 @@ import tileMap from '../../public/assets/game.json';
 
 import star from '../../public/assets/star.png';
 
+let time,
+  enemies = [],
+  enemyDirection = 'right';
+
 let snowman,
   player,
   keys,
   sound,
   text,
   stars,
-  points = 0;
+  points = 0,
+  moveTime = 0;
 
 let isDead = false,
   isMoving = false,
@@ -120,6 +125,7 @@ export default class GameScene extends Phaser.Scene {
             .play('snowman-right', true)
             .setFixedRotation();
 
+          enemies.push(snowman);
           break;
         }
         case 'star': {
@@ -160,7 +166,7 @@ export default class GameScene extends Phaser.Scene {
 
     ground.forEachTile((tile) => {
       // If a tile body exists, set the friction of it to 0
-      if (tile.physics.matterBody.body) {
+      if (tile.physics.matterBody) {
         tile.physics.matterBody.body.friction = 0;
       } else {
         console.log('no bueno');
@@ -272,6 +278,8 @@ export default class GameScene extends Phaser.Scene {
     if (isClimbing) {
       this.climb();
     }
+
+    this.moveEnemies(enemies);
   }
   jump() {
     touchingGround = false;
@@ -294,6 +302,31 @@ export default class GameScene extends Phaser.Scene {
       player.play('player-climb', true);
     } else {
       player.setVelocity(0, 0);
+    }
+  }
+
+  moveEnemy(enemy) {
+    if (enemyDirection === 'right') {
+      enemy.setVelocityX(2);
+    } else if (enemyDirection === 'left') {
+      enemy.setVelocityX(-2);
+    }
+  }
+
+  moveEnemies(enemies) {
+    // Move enemies
+    if (time < 25) {
+      time++;
+      enemies.forEach((enemy) => {
+        this.moveEnemy(enemy);
+      });
+    } else {
+      time = 0;
+      if (enemyDirection === 'right') {
+        enemyDirection = 'left';
+      } else if (enemyDirection === 'left') {
+        enemyDirection = 'right';
+      }
     }
   }
 
@@ -380,13 +413,17 @@ export default class GameScene extends Phaser.Scene {
   restartGame() {
     this.cameras.main.fadeOut(1000, 0, 0, 0);
 
-    (isDead = false),
-      (isMoving = false),
-      (isClimbing = false),
-      (touchingGround = true),
-      (jumpCount = 0),
-      (alreadyPressed = false),
-      (points = 0);
+    setTimeout(() => {
+      (isDead = false),
+        (isMoving = false),
+        (isClimbing = false),
+        (touchingGround = true),
+        (jumpCount = 0),
+        (alreadyPressed = false),
+        (points = 0);
+
+      (time = 0), (enemies = []), (enemyDirection = 'right');
+    }, 1000);
   }
 }
 
