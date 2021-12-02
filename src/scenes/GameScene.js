@@ -43,7 +43,7 @@ let gameOptions = {
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
-    super('game-scene');
+    super('GameScene');
   }
 
   init() {
@@ -159,7 +159,7 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.once(
       Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
       (cam, effect) => {
-        this.scene.start();
+        this.scene.start('GameOver');
       }
     );
     this.matter.world.convertTilemapLayer(ground);

@@ -6,6 +6,7 @@
 
 body {
   width: 100vw;
+  background-color: rgb(47, 152, 201);
 }
 
 canvas {
