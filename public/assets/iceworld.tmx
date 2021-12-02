@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="70" tileheight="70" infinite="0" backgroundcolor="#000000" nextlayerid="8" nextobjectid="63">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="70" tileheight="70" infinite="0" backgroundcolor="#000000" nextlayerid="8" nextobjectid="64">
  <editorsettings>
   <export target="game.json" format="json"/>
  </editorsettings>
@@ -604,10 +604,11 @@
   <object id="12" name="star" x="2456.43" y="3215.49" width="66.561" height="63.3914"/>
   <object id="42" name="enemy-spawn" x="1455.95" y="3215.31" width="70.6106" height="70.6106"/>
   <object id="56" name="enemy-spawn" x="1900.73" y="3225.65" width="59.8696" height="57.6911"/>
-  <object id="57" name="enemy-spawn" x="2250.3" y="2306.76" width="70.6106" height="70.6106"/>
+  <object id="57" name="enemy-spawn" x="2250.99" y="2356.39" width="70.6106" height="23.7334"/>
   <object id="55" name="enemy-spawn" x="1328.15" y="3217.6" width="70.6106" height="70.6106" rotation="357.351"/>
-  <object id="44" name="enemy-spawn" x="926.245" y="3293.78" width="70.6106" height="62.3034"/>
+  <object id="44" name="enemy-spawn" x="860.377" y="3390.25" width="70.6106" height="39.682"/>
   <object id="51" name="ladder" x="1149.87" y="2877.91" width="9.68992" height="335.917"/>
   <object id="52" x="-109.819" y="3714.47" width="3.22997"/>
+  <object id="63" name="ladder" x="2830.43" y="3088.57" width="9.68992" height="318.61"/>
  </objectgroup>
 </map>
