@@ -14,7 +14,7 @@ const config = {
       debug: true,
     },
   },
-  backgroundColor: '21E3232',
+  transparent: true,
 
   pixelArt: true,
   scene: [GameLanding, GameScene, GameOver],
