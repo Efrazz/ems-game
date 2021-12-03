@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 
 import GameScene from './scenes/GameScene';
+import GameLanding from './scenes/GameLanding';
+import GameOver from './scenes/GameOver';
 
 const config = {
   type: Phaser.AUTO,
@@ -12,7 +14,10 @@ const config = {
       debug: false,
     },
   },
-  scene: [GameScene],
+  transparent: true,
+
+  pixelArt: true,
+  scene: [GameLanding, GameScene, GameOver],
 };
 
 export default new Phaser.Game(config);
