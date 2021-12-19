@@ -14,10 +14,9 @@ const config = {
       debug: false,
     },
   },
-  transparent: true,
-
+  // transparent: true,
   pixelArt: true,
-  scene: [GameLanding, GameScene, GameOver],
+  scene: [GameScene],
 };
 
 export default new Phaser.Game(config);

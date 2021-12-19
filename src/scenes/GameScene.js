@@ -19,7 +19,7 @@ let time,
 let snowman,
   player,
   keys,
-  sound,
+  soundd,
   text,
   stars,
   points = 0,
@@ -58,7 +58,7 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     // Background
     this.load.image('star', star);
-    // this.load.audio('jumpsound', '../../music/mario.mp3');
+    this.load.audio('jumpsound', '../../music/impact.mp3');
 
     // Tiles
     this.load.image('tiles', tileSheet);
@@ -71,12 +71,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // sound = this.sound.add('jumpsound');
+    soundd = this.sound.add('jumpsound');
     text = this.add.text(100, 100, 'Score: 0', {
       fontFamily: 'CustomFont',
       fontSize: '32px',
       align: 'left',
-      fill: '#FFFFFF',
     });
     text.setDepth(1000);
     // Init animations
@@ -160,7 +159,7 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.once(
       Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
       (cam, effect) => {
-        this.scene.start('GameOver');
+        this.scene.start('GameScene');
       }
     );
     this.matter.world.convertTilemapLayer(ground);
@@ -177,8 +176,8 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     isMoving = false;
-    text.x = player.body.position.x - 390;
-    text.y = player.body.position.y - 290;
+    text.x = player.body.position.x - 320;
+    text.y = player.body.position.y - 390;
 
     // Change isMoving to true if left or right key is pressed down
     if ((keys.left.isDown || keys.right.isDown) && !isDead) {
@@ -268,7 +267,7 @@ export default class GameScene extends Phaser.Scene {
     // If player is not climbing, button "up" is pressed down button has not
     if (!isClimbing && keys.up.isDown && alreadyPressed === false) {
       this.jump();
-      // sound.play();
+      soundd.play();
 
       alreadyPressed = true;
     } else if (keys.up.isUp) {
