@@ -58,8 +58,8 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     // Background
     this.load.image('star', star);
-    this.load.audio('jumpsound', '../../music/impact.mp3');
-
+    /* this.load.audio('jumpsound', '../../music/impact.mp3');
+     */
     // Tiles
     this.load.image('tiles', tileSheet);
     this.load.tilemapTiledJSON('tilemap', tileMap);
@@ -71,7 +71,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    soundd = this.sound.add('jumpsound');
+    /* soundd = this.sound.add('jumpsound'); */
     text = this.add.text(100, 100, 'Score: 0', {
       fontFamily: 'CustomFont',
       fontSize: '32px',
@@ -176,8 +176,8 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     isMoving = false;
-    text.x = player.body.position.x - 320;
-    text.y = player.body.position.y - 390;
+    text.x = player.body.position.x - 620;
+    text.y = player.body.position.y - 550;
 
     // Change isMoving to true if left or right key is pressed down
     if ((keys.left.isDown || keys.right.isDown) && !isDead) {
@@ -258,7 +258,7 @@ export default class GameScene extends Phaser.Scene {
       if (collisionObj.label === 'ladder') {
         console.log('climb end');
         player.setIgnoreGravity(false);
-        player.play('player-jump');
+        /* player.play('player-jump'); */
         isClimbing = false;
       }
     });
@@ -267,7 +267,7 @@ export default class GameScene extends Phaser.Scene {
     // If player is not climbing, button "up" is pressed down button has not
     if (!isClimbing && keys.up.isDown && alreadyPressed === false) {
       this.jump();
-      soundd.play();
+      /* soundd.play(); */
 
       alreadyPressed = true;
     } else if (keys.up.isUp) {
@@ -286,7 +286,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Equal jump height
     if (jumpCount < gameOptions.jumps) {
-      player.play('player-jump');
+      /* player.play('player-jump'); */
       player.setVelocityY(-gameOptions.jumpForce);
       jumpCount++;
     }
